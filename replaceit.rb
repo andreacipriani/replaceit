@@ -9,20 +9,6 @@ if ARGV.length != 1
   exit
 end
 
-# Configurations
-
-# For replacing occurences from -> to
-from = "foo"
-to = "bar"
-
-# For checking if a file contains one of this words
-strings_to_match = ["foo", "bar", "zoo"]
-
-# For adding a line on top of a file
-
-content_to_append = "new line at top"
-
-
 target_folder_path = ARGV[0]
 
 # Functions
@@ -67,7 +53,7 @@ def replaceIfMatching(string, replacements, ignore)
 	return string
 end
 
-def replaceContentOfFileIfMatching(content, replacements, ignore)
+def replaceContentOfFileIfMatching(content, replacements, ignore, file)
 	new_content = replaceIfMatching(content, replacements, ignore)
 	if new_content != content
 		puts "replacing occurences in file #{file}"
@@ -79,18 +65,32 @@ end
 
 puts("\n\n*** Starting replacing it! *** \n\n")
 
+
+# For replacing occurences from -> to
+from = "foo"
+to = "bar"
 replacements = { from => to} 
 
 Dir.glob(target_folder_path + "/**/*") do |file|
-	is_file_relevant = File.extname(file) == ".m" || File.extname(file) == ".h"
+	is_file_relevant = File.extname(file) == ".yaml" || File.extname(file) == ".swift" 
 	if is_file_relevant
 		content = File.read(file)
-					
-		file_matches_strings = content_of_file_contains_multiple_strings(content, strings_to_match)
-		if file_matches_strings
-			puts("\n\n file: " + file + " contains one of: " + strings_to_match.inspect)
-			append_content_on_top_of_file(file, content_to_append)
-		end
+		replaceContentOfFileIfMatching(content, replacements, "ignore file if it contains this string", file)
 	end
 end
 
+
+#  Append string on top of file if it contains some strings (e.g: add import if file references a class)
+
+# For checking if a file contains one of this words
+# strings_to_match = ["foo at top"]
+# For adding a line on top of a file
+# content_to_append = "new line at top"
+
+# Dir.glob(target_folder_path + "/**/*") do |file|
+# 	file_matches_strings = content_of_file_contains_multiple_strings(content, strings_to_match)
+# 	if file_matches_strings
+# 		puts("\n\n file: " + file + " contains one of: " + strings_to_match.inspect)
+# 		append_content_on_top_of_file(file, content_to_append)
+# 	end
+# end
